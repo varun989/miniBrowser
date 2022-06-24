@@ -32,6 +32,7 @@ class ViewController: UIViewController {
 
     var lastOffsetY: CGFloat = 0
     let urlString = "https://addons.mozilla.org/en-US/firefox/addon/top-sites-button"
+    var webviewLoaded = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -216,6 +217,7 @@ extension ViewController: UITextFieldDelegate {
 
 extension ViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        webviewLoaded = true
         webView.evaluateJavaScript("var firstbtn = document.getElementsByClassName('Button Button--action GetFirefoxButton-button Button--puffy')[0]; firstbtn.innerText = 'Hello'; let btn = document.createElement('button'); btn.className = 'Button Button--action GetFirefoxButton-button Button--puffy'; btn.innerHTML = 'Add to Orion'; btn.addEventListener('click', function () {var downloadLink = document.getElementsByClassName('InstallButtonWrapper-download-link')[0].href; window.webkit.messageHandlers.observer.postMessage(downloadLink);}); document.body.appendChild(btn); firstbtn.parentNode.replaceChild(btn, firstbtn);") { (result, error) in
             if error == nil {
                 print(result ?? "")
@@ -246,6 +248,7 @@ extension ViewController: UIScrollViewDelegate {
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !webviewLoaded { return }
         webViewDidScroll(yOffsetChange: lastOffsetY - scrollView.contentOffset.y)
     }
 }
